@@ -25,6 +25,15 @@ def home():
 def about():
     """Render the website's about page."""
     return render_template('about.html')
+    
+@app.route('/secure-page/')
+@login_required
+def secure_page():
+    """Render a secure page on our website that only logged in users can access."""
+    return render_template('secure_page.html')
+
+
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -37,23 +46,31 @@ def login():
             username = form.username.data
             password = form.password.data
             
-            user = UserProfile.query.filter_by(username=username, password=password).first()
+            user = UserProfile.query.filter_by(username=username, password=password)\.first()
 
             # using your model, query database for a user based on the username
             # and password submitted
             # store the result of that query to a `user` variable so it can be
             # passed to the login_user() method.
-
+            #steps 7 & 6 is actually steps 7 & 8
             # get user id, load into session
             login_user(user)
             
             flash("Logged in successfully")
             next = request.args.get('next')
-            
 
             # remember to flash a message to the user
             return redirect(url_for("home")) # they should be redirected to a secure-page route instead
     return render_template("login.html", form=form)
+    
+    
+@app.route('/logout')
+@login_required
+def logout():
+    #logout the user and end the session
+    logout_user()
+    flash("You've just been logged out")
+    return redirect(url_for('home'))
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
